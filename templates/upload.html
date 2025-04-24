@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create - Meal Plan Wrapped</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #232d4b, #e57200);
+            color: #fff;
+            height: 100vh;
+            overflow: auto; /* Changed from hidden to auto for scrollability */
+            position: relative;
+        }
+        .background-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0) 70%);
+
+        }
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+        a {
+            color: #e57200;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: #e57200;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #d65f00;
+        }
+        form {
+            margin-top: 20px;
+        }
+        input[type="file"] {
+            margin-bottom: 10px;
+        }
+        table {
+            display: none;
+        }
+
+    </style>
+    <!-- Matomo -->
+    <script>
+        var _paq = window._paq = window._paq || [];
+        /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+        _paq.push(['trackPageView']);
+        _paq.push(['enableLinkTracking']);
+        (function() {
+        var u="//tmn.rit.cl/static/services/analytics/";
+        _paq.push(['setTrackerUrl', u+'matomo.php']);
+        _paq.push(['setSiteId', '10']);
+        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+        g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+        })();
+  </script>
+  <!-- End Matomo Code -->
+</head>
+<body>
+    <div class="background-animation"></div>
+    <div class="container">
+        <h1>Welcome to 2025 UVA Meal Plan Wrapped</h1>
+        <p>Follow these steps to make yours:</p>
+        <ol style="text-align: left">
+            <li> <strong>Need to be on a laptop using Chrome/Edge/Opera (not Safari or Firefox)</strong></li>
+            <li>Visit the <a href="https://csg-web1.eservices.virginia.edu/student/svc_history.php#viewHist" target="_blank">UVA CBORD GET</a> website and log in with NetBadge.</li>
+            <li>Set the date range from 2024 to the current date, set account to "All Plans," and click "View History."</li>
+            <li>Copy the displayed data to your clipboard including the table headers. Refer to the example below:</li>
+            <video controls style="max-width: 100%; height: 300px; object-fit: cover; margin: 10px 0;">
+                <source src="static/example.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </ol>
+        <p>Once you've copied the data, paste it below to proceed:</p>
+        <button id="paste-button">Paste Copied Data</button>
+
+        <table id="meal-plan-table" style="display: none;"></table>
+        <form action="/" method="post" enctype="multipart/form-data" style="display: none;">
+            <input type="file" name="file" accept=".csv" required>
+            <button type="submit">Upload</button>
+        </form>
+    </div>
+    <footer style="position: absolute; bottom: 10px; width: 100%; text-align: center; color: #fff; font-size: 0.9rem;">
+        Created by Maddox</a>
+    </footer>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="static/table2csv.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#paste-button').click(function() {
+                console.log("Paste button clicked");
+                if (navigator.clipboard && navigator.clipboard.readText) {
+                    navigator.clipboard.readText().then(function(text) {
+                        console.log("Clipboard text: \n", text);
+                        var lines = text.split('\n');
+                        var headers = lines[0].split('\t');
+                        var csvRows = [headers.join(',')]; // Start with the header row
+                        
+                        for (var i = 1; i < lines.length; i++) {
+                            var cells = lines[i].split('\t');
+                            if (cells.length === headers.length) {
+                                csvRows.push(cells.join(',')); // Add each row as a CSV row
+                            }
+                        }
+
+                        var csv = csvRows.join('\n'); // Combine rows into a CSV string
+                        console.log("CSV data: \n", csv);
+                        var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                        var link = document.createElement("a");
+                        link.href = URL.createObjectURL(blob);
+                        link.download = "meal_plan.csv";
+                        var fileInput = document.querySelector('input[type="file"]');
+                        var dataTransfer = new DataTransfer();
+                        var file = new File([blob], "meal_plan.csv", { type: 'text/csv' });
+                        dataTransfer.items.add(file);
+                        fileInput.files = dataTransfer.files;
+                        var form = document.querySelector('form');
+                        form.addEventListener('submit', function(event) {
+                            event.preventDefault();
+                            console.log("Form submitted with file: ", file.name);
+                        });
+                        form.submit();
+                    }).catch(function(err) {
+                        console.error('Failed to read clipboard contents: ', err);
+                    });
+                } else {
+                    alert('Clipboard API not supported in this browser. Please paste manually.');
+                }
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const uvaLink = document.querySelector('a[href*="csg-web1.eservices.virginia.edu"]');
+            uvaLink.addEventListener('click', function(event) {
+                if (/Mobi|Android/i.test(navigator.userAgent)) {
+                    event.preventDefault();
+
+                    // Create a styled modal
+                    const modal = document.createElement('div');
+                    modal.style.position = 'fixed';
+                    modal.style.top = '50%';
+                    modal.style.left = '50%';
+                    modal.style.transform = 'translate(-50%, -50%)';
+                    modal.style.backgroundColor = '#fff';
+                    modal.style.color = '#333';
+                    modal.style.padding = '20px';
+                    modal.style.borderRadius = '10px';
+                    modal.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+                    modal.style.zIndex = '1000';
+                    modal.style.textAlign = 'center';
+
+                    // Add content to the modal
+                    const message = document.createElement('p');
+                    message.textContent = "The UVA CBORD GET website is not compatible with mobile devices. Please use a laptop to create your wrapped, after which you can access it on any device.";
+                    message.style.marginBottom = '20px';
+                    modal.appendChild(message);
+
+                    const closeButton = document.createElement('button');
+                    closeButton.textContent = 'Close';
+                    closeButton.style.backgroundColor = '#e57200';
+                    closeButton.style.color = '#fff';
+                    closeButton.style.border = 'none';
+                    closeButton.style.padding = '10px 20px';
+                    closeButton.style.borderRadius = '5px';
+                    closeButton.style.cursor = 'pointer';
+                    modal.style.width = '70%';
+                    closeButton.addEventListener('click', function() {
+                        document.body.removeChild(modal);
+                        document.body.removeChild(overlay);
+                    });
+                    modal.appendChild(closeButton);
+
+                    // Add an overlay
+                    const overlay = document.createElement('div');
+                    overlay.style.position = 'fixed';
+                    overlay.style.top = '0';
+                    overlay.style.left = '0';
+                    overlay.style.width = '100%';
+                    overlay.style.height = '100%';
+                    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+                    overlay.style.zIndex = '999';
+                    overlay.addEventListener('click', function() {
+                        document.body.removeChild(modal);
+                        document.body.removeChild(overlay);
+                    });
+
+                    // Append modal and overlay to the body
+                    document.body.appendChild(overlay);
+                    document.body.appendChild(modal);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

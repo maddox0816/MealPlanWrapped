@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View - Meal Plan Wrapped</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" integrity="sha512-ZwR1/gSZM3ai6vCdI+LVF1zSq/5HznD3ZSTk7kajkaj4D292NLuduDCO1c/NT8Id+jE58KYLKT7hXnbtryGmMg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #232d4b, #e57200);
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        .background-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0) 70%);
+            animation: pulse 5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+        }
+        .container {
+            display: flex;
+            /*justify-content: center;
+            align-items: center;*/
+            height: 100%;
+            position: relative;
+            overflow: hidden; /* Prevent scrolling */
+        }
+        .stats {
+            position: absolute;
+            width: 100%;
+            height: 90%; /* Ensure each slide takes up the full container */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .stats.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .stats ul {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .stats li {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            width: 300px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: calc(50% - 20px); /* Adjust width for better fit */
+            max-width: 300px;
+        }
+        .stats li:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        }
+        .stats li i {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            color: #e57200;
+        }
+        .stats li strong {
+            display: block;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        .stats li .commentary {
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+        .final-summary ul {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .final-summary ul li {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            padding: 10px 15px;
+            width: auto;
+            text-align: center;
+            width: 100%; /* Ensure list items take full width on smaller screens */
+        }
+        .commentary {
+            margin-top: 10px;
+            font-style: italic;
+            color: #ddd;
+        }
+        .tap-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            user-select: none; /* Prevent text selection */
+            -webkit-tap-highlight-color: transparent; /* Remove blue flash on tap */
+        }
+        .final-summary {
+            text-align: center;
+            margin-top: 20px;
+            padding: 14px; /* Reduced padding */
+            box-sizing: border-box;
+            margin: 0 auto;
+            font-size: 0.95rem; /* Scaled down font size */
+            transform: scale(0.80); /* Scaled down the entire section */
+            background: linear-gradient(135deg, #232d4b, #e57200), rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            aspect-ratio: 9 / 16; /* Lock the ratio to 9:16 for Instagram/Snapchat stories */
+
+        }
+
+        @media (min-width: 1024px) {
+            .final-summary {
+                transform: scale(1);
+                max-width: 400px;
+                aspect-ratio: auto;
+            }
+        }
+
+        .share-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #e57200;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .share-button:hover {
+            background-color: #d65f00;
+        }
+        /* Remove dots from ul elements */
+        ul {
+            list-style-type: none;
+            padding: 0;
+            /* Fill full possible width */
+            width: 100%;
+        }
+
+
+        .final-summary h2 {
+            font-size: 2rem;
+            color: #e57200;
+            margin-bottom: 20px;
+        }
+
+        .final-summary ul {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .final-summary ul li {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            width: 45%;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .final-summary ul li:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .final-summary ul li i {
+            font-size: 2rem;
+            color: #e57200;
+            margin-bottom: 10px;
+        }
+
+        .final-summary ul li strong {
+            display: block;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .final-summary ul li span {
+            font-size: 1rem;
+            color: #fff;
+        }
+
+        /* Responsive design for mobile screens */
+        @media (max-width: 768px) {
+            .stats {
+                transform: scale(0.95);
+            }
+            
+            .stats ul {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .stats li {
+                width: 90%;
+                margin: 0 auto;
+                width: 100%; /* Full width for smaller screens */
+            }
+
+            .final-summary ul {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .final-summary ul li {
+                width: 100%;
+                width: 100%; /* Full width for smaller screens */
+            }
+
+            .final-summary {
+                padding: 15px;
+            }
+
+            .final-summary h2 {
+                font-size: 1.5rem;
+            }
+
+            .final-summary ul li i {
+                font-size: 1.5rem;
+            }
+
+            .final-summary ul li strong {
+                font-size: 1rem;
+            }
+
+            .final-summary ul li span {
+                font-size: 0.9rem;
+            }
+        }
+        
+        .top-takeout-list {
+            margin-top: 20px;
+            text-align: center;
+            color: #fff;
+        }
+
+        .top-takeout-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .top-takeout-list li {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            padding: 10px;
+            margin: 5px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .top-takeout-list {
+                text-align: left;
+                padding: 0 15px;
+            }
+        }
+
+        /* Ensure charts are responsive */
+
+
+        /* Adjust stats container for better responsiveness */
+        .stats {
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+
+        .final-summary ul li {
+            width: 100%; /* Ensure list items take full width on smaller screens */
+        }
+
+        /* Adjust the layout for the page with 4 boxes */
+        .stats ul {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .stats li {
+            width: calc(50% - 20px); /* Adjust width for better fit */
+            max-width: 300px;
+        }
+
+        @media (max-width: 768px) {
+            .stats li {
+                width: 100%; /* Full width for smaller screens */
+            }
+
+            .final-summary ul li {
+                width: 100%; /* Full width for smaller screens */
+            }
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 90%;
+            padding-top: 10px;
+        }
+    </style>
+    <!-- Matomo -->
+    <script>
+        var _paq = window._paq = window._paq || [];
+        /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+        _paq.push(['trackPageView']);
+        _paq.push(['enableLinkTracking']);
+        (function() {
+        var u="//tmn.rit.cl/static/services/analytics/";
+        _paq.push(['setTrackerUrl', u+'matomo.php']);
+        _paq.push(['setSiteId', '10']);
+        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+        g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+        })();
+  </script>
+  <!-- End Matomo Code -->
+</head>
+<body>
+    <div class="background-animation"></div>
+    <div class="container">
+        <div class="stats active" id="page-0">
+            <div class="intro-page">
+                <h1>Welcome to Meal Plan Wrapped!</h1>
+                <p>Prepare to be amazed by your dining habits!</p>
+                <p>From late-night snacks to record-breaking meal swipes, we've got it all covered.</p>
+                <i class="fas fa-utensils" style="font-size: 5rem; color: #e57200; margin-top: 20px;"></i>
+                <p style="margin-top: 20px;">Tap right to start exploring your stats!</p>
+ 
+            </div>
+        </div>
+        <div class="stats" id="page-1">
+            <ul>
+                <li>
+                    <i class="fas fa-calendar-alt"></i>
+                    <strong>Most Common Day:</strong> {{ stats.most_common_day }}
+                    <div class="commentary">"Looks like {{ stats.most_common_day }} is your go-to day for meals!"</div>
+                </li>
+                <li>
+                    <i class="fas fa-utensils"></i>
+                    <strong>Most Common Dining Hall:</strong> {% set top_1 = stats.dining_hall_counts.items() | list %}
+                    {% for location, count in top_1[:1] %}
+                        {{ location }} ({{ count }} swipes)
+                    {% endfor %}
+                    <div class="commentary">
+                        {% set top_3 = stats.dining_hall_counts.items() | list %}
+                        1. {% for location, count in top_3[:1] %}
+                            {{ location }}: {{ count }} meals 
+                        {% endfor %}
+                        <br>
+                        2. {% for location, count in top_3[1:2] %}
+                            {{ location }}: {{ count }} meals 
+                        {% endfor %}
+                        <br>
+                        3. {% for location, count in top_3[2:3] %}
+                            {{ location }}: {{ count }} meals 
+                        {% endfor %}
+                        <div class="commentary">"You love dining at {{ stats.most_common_location }}!"</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="stats" id="page-2">
+            <ul>
+                <li>
+                    <i class="fas fa-sun"></i>
+                    <strong>Earliest Meal:</strong> {{ stats.earliest_meal }}
+                    <div class="commentary">"Early bird gets the worm!"</div>
+                </li>
+                <li>
+                    <i class="fas fa-moon"></i>
+                    <strong>Latest Meal:</strong> {{ stats.latest_meal }}
+                    <div class="commentary">"Burning the midnight oil, huh?"</div>
+                </li>
+            </ul>
+        </div>
+        <div class="stats" id="page-3">
+            <ul>
+                <li>
+                    <i class="fas fa-box"></i>
+                    <strong>Most Ordered Takeout Place:</strong> {% set top_1 = stats.meal_exchange_location_counts.items() | list %}
+                    {% for location, count in top_1[:1] %}
+                        {{ location }} ({{ count }} meals)
+                    {% endfor %}
+                    <div class="commentary">
+                        {% set top_3 = stats.meal_exchange_location_counts.items() | list %}
+                        1. {% for location, count in top_3[:1] %}
+                            {{ location }}: {{ count }} meals 
+                        {% endfor %}
+                        <br>
+                        2. {% for location, count in top_3[1:2] %}
+                            {{ location }}: {{ count }} meals 
+                        {% endfor %}
+                        <br>
+                        3. {% for location, count in top_3[2:3] %}
+                            {{ location }}: {{ count }} meals 
+                        {% endfor %}
+                    </div>
+                    <div class="commentary">"Takeout champion! {{ stats.most_ordered_takeout }} is your favorite."</div>
+                </li>
+                <li>
+                    <i class="fas fa-dollar-sign"></i>
+                    <strong>Total Dollars Spent:</strong> ${{ stats.total_dollars_spent }}
+                    <div class="commentary">"You've spent a significant amount on meals!"</div>
+                </li>
+            </ul>
+        </div>
+        <div class="stats" id="page-4">
+            <ul>
+                <li>
+                    <i class="fas fa-credit-card"></i>
+                    <strong>Total Swipes Used:</strong> {{ stats.total_swipes_used }}
+                    <div class="commentary">"Swipe, swipe, swipe! You're making the most of your meal plan."</div>
+                </li>
+                <li>
+                    <i class="fas fa-exchange-alt"></i>
+                    <strong>Total Meal Exchanges:</strong> {{ stats.total_meal_exchanges }}
+                    <div class="commentary">"Professional dining hall avoider!"</div>
+                </li>
+            </ul>
+        </div>
+        <div class="stats" id="page-5">
+            <ul>
+                <li>
+                    <i class="fas fa-chart-line"></i>
+                    <strong>Average Meal Exchanges Per Day:</strong> {{ stats.average_meal_exchanges_per_day }}
+                    <div class="commentary">"Keeping it consistent with {{ stats.average_meal_exchanges_per_day }} exchanges per day!"</div>
+                </li>
+                <li>
+                    <i class="fas fa-moon"></i>
+                    <strong>Number of Late-Night Meals:</strong> {{ stats.late_night_meals }}
+                    <div class="commentary">"Late-night snacker alert!"</div>
+                </li>
+            </ul>
+        </div>
+        <div class="stats" id="page-6">
+            <ul>
+                <li>
+                    <i class="fas fa-coins"></i>
+                    <strong>Most Expensive Single Meal:</strong> ${{ stats.most_expensive_meal }}
+                    <div class="commentary">"Treat yourself! That meal was worth it."</div>
+                </li>
+                <li>
+                    <i class="fas fa-hourglass-half"></i>
+                    <strong>Longest Time Between Meals:</strong> {{ stats.longest_time_between_meals }}
+                    <div class="commentary">"Longest gap? You must have been starving! Or perhaps you took a break and enjoyed some home-cooked meals."</div>
+                </li>
+            </ul> 
+        </div>
+        <div class="stats" id="page-7">
+            <ul>
+                <li>
+                    <i class="fas fa-hourglass-end"></i>
+                    <strong>Shortest Time Between Meals:</strong> {{ stats.shortest_time_between_meals }}
+                    <div class="commentary">"Barely waited! Hungry much?"</div>
+                </li>
+                <li>
+                    <i class="fas fa-utensils"></i>
+                    <strong>Most Meals Used in a Single Day:</strong> {{ stats.most_meals_in_a_day }}
+                    <div class="commentary">"A record-breaking day with {{ stats.most_meals_in_a_day }} meals!"</div>
+                </li>
+            </ul>
+        </div>
+        <div class="stats" id="page-8">
+            <div class="chart-container">
+                <h2>Takeout Locations</h2>
+                <canvas id="mealExchangeChart"></canvas>
+            </div>
+            <!--<div class="top-takeout-list">
+                <h3>Top 3 Takout Places</h3>
+                <ul>
+        
+                    {% set top_3 = stats.meal_exchange_location_counts.items() | list %}
+                    {% for location, count in top_3[:3] %}
+                        <li>{{ location }}: {{ count }} meals</li>
+                    {% endfor %}
+
+
+
+    
+    
+
+                </ul>
+            </div>-->
+        </div>
+        <div class="stats" id="page-9">
+            <div class="chart-container">
+                <h2>Average Meals by Day</h2>
+                <canvas id="avgMealsChart"></canvas>
+            </div>
+        </div>
+        <div class="stats" id="page-10" style="margin-top: 50px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; overflow:auto; scrollbar-width: none; -ms-overflow-style: none;"> 
+            <div style="width: 100%; max-width: 600px; margin-bottom: 20px;">
+            <h2>Meal Plan Wrapped</h2>
+            <p>Thank you for using Meal Plan Wrapped! Here's a summary of your stats:</p>
+            <button class="share-button" id="share-button" style="margin-bottom: 0px;"><i class="fas fa-share-alt"></i> Share with Friends</button>
+            <button class="share-button" id="copy-link-button" style="margin-top: 10px;"><i class="fas fa-link"></i> Copy Your Link</button>
+            </div>
+
+            <div class="final-summary">
+            <h2><i class="fas fa-utensils"></i> Meal Plan Highlights</h2>
+            <p>Discover your personalized stats at <a href="https://mealplanwrapped.tech" target="_blank" style="color: #e57200; text-decoration: underline;">mealplanwrapped.tech</a>!</p>
+            
+            <ul>
+                <li>
+                <i class="fas fa-calendar-alt"></i>
+                <strong>Most Popular Day for Meals</strong>
+                <span>{{ stats.most_common_day }}</span>
+                </li>
+                <li>
+                <i class="fas fa-utensils"></i>
+                <strong>Most Used Dining Hall</strong>
+                <span>{% set top_1 = stats.dining_hall_counts.items() | list %}
+                    {% for location, count in top_1[:1] %}
+                        {{ location }}: {{ count }} meals 
+                    {% endfor %} </span>
+                </li>
+                <li>
+                <i class="fas fa-shopping-bag"></i>
+                <strong>Top Takout Location</strong>
+                <span>{% set top_1 = stats.meal_exchange_location_counts.items() | list %}
+                    {% for location, count in top_1[:1] %}
+                        {{ location }}: {{ count }} meals 
+                    {% endfor %}
+                </span>
+                <li>
+                <i class="fas fa-credit-card"></i>
+                <strong>Total Swipes Used</strong>
+                <span>{{ stats.total_swipes_used }}</span>
+                </li>
+                <li>
+                <i class="fas fa-coins"></i>
+                <strong>Total Flex Dollars Spent</strong>
+                <span>${{ stats.total_dollars_spent }}</span>
+                </li>
+            </ul>
+            </div>
+        </div>
+        <style>
+            #page-10::-webkit-scrollbar {
+            display: none;
+            }
+        </style>
+        <div class="tap-area" id="tap-area"></div>
+    </div>
+    <footer style="position: absolute; bottom: 10px; width: 100%; text-align: center; color: #fff; font-size: 0.9rem;">
+        Created by Maddox</a>
+    </footer>
+    <script src="/static/html2canvas.min.js"></script>
+    <script>
+        const pages = document.querySelectorAll('.stats');
+        const tapArea = document.getElementById('tap-area');
+        const shareButton = document.getElementById('share-button');
+        let currentPage = 0;
+
+        function updatePage() {
+            pages.forEach((page, index) => {
+                page.classList.toggle('active', index === currentPage);
+            });
+            if (currentPage === pages.length - 1) {
+                tapArea.style.display = 'none'; // Hide the tap area
+            }
+        }
+
+        tapArea.addEventListener('click', (event) => {
+            const tapX = event.clientX;
+            const screenWidth = window.innerWidth;
+
+            if (tapX > screenWidth / 2) { // Right half of the screen
+                if (currentPage < pages.length - 1) {
+                    currentPage++;
+                    updatePage();
+                }
+            } else { // Left half of the screen
+                if (currentPage > 0) {
+                    currentPage--;
+                    updatePage();
+                }
+            }
+        });
+
+        shareButton.addEventListener('click', async () => {
+            const container = document.querySelector('.final-summary');
+            // Use html2canvas to capture the final summary section
+            try {
+                const canvas = await html2canvas(container, {
+                    allowTaint: true,
+                    backgroundColor: null,
+                    scale: 6 // Increase scale for better quality
+                });
+                const dataUrl = canvas.toDataURL('image/png');
+                const blob = await (await fetch(dataUrl)).blob();
+                const file = new File([blob], 'meal-plan-summary.png', { type: 'image/png' });
+                if (navigator.share) {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Meal Plan Wrapped',
+                        text: 'Check out my Meal Plan Wrapped stats! Visit https://mealplanwrapped.tech to see yours!',
+                        url: 'https://mealplanwrapped.tech'
+                    });
+                } else {
+                    alert('Sharing is not supported on this device.');
+                }
+            } catch (error) {
+                console.error('Error sharing stats:', error);
+            }
+        });
+
+        // Pie Chart for Meal Exchange Locations
+        const mealExchangeCtx = document.getElementById('mealExchangeChart').getContext('2d');
+        //set labels to label + (x meals)
+        const labels = {{ stats.meal_exchange_location_counts.keys() | list | tojson }}.map((label, index) => label + ' (' + {{ stats.meal_exchange_location_counts.values() | list | tojson }}[index] + ')');
+        new Chart(mealExchangeCtx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: {{ stats.meal_exchange_location_counts.values() | list | tojson }},
+                    backgroundColor: [
+                        '#FFA07A', '#20B2AA', '#87CEFA', '#FFB6C1', '#9370DB',
+                        '#40E0D0', '#FFD700', '#FF8C00', '#32CD32', '#6A5ACD',
+                        '#FF6347', '#3CB371', '#4682B4', '#FF69B4', '#00CED1',
+                        '#F0E68C', '#FF7F50', '#66CDAA', '#7B68EE', '#FF4500'
+                    ],
+                    borderColor: '#ffffff',
+                    borderWidth: 1
+                }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: '#ffffff'
+                            }
+                        },
+                    }
+                }
+            });
+
+        // Bar Graph for Average Meals by Day
+        const avgMealsCtx = document.getElementById('avgMealsChart').getContext('2d');
+        new Chart(avgMealsCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ stats.avg_meals_by_day.keys() | list | tojson }},
+                datasets: [{
+                    label: 'Average Meals',
+                    data: {{ stats.avg_meals_by_day.values() | list | tojson }},
+                    backgroundColor: '#36A2EB',
+                    borderColor: '#ffffff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false,
+                        labels: {
+                            color: '#ffffff'
+                        }
+                    },
+
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: '#ffffff'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#ffffff'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.2)'
+                        }
+                    }
+                }
+            }
+        });
+
+        updatePage();
+
+        // Copy link button functionality
+        const copyLinkButton = document.getElementById('copy-link-button');
+        copyLinkButton.addEventListener('click', () => {
+            const link = window.location.href;
+            navigator.clipboard.writeText(link).then(() => {
+                console.log('Link copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        });
+    </script>
+</body>
+</html>
