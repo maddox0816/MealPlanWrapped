@@ -23,7 +23,6 @@ A Flask web application to analyze your university meal plan usage from a CSV ex
         ```bash
         pip install Flask pandas Pillow wonderwords
         ```
-    *   Consider creating a `requirements.txt` file for easier dependency management.
 3.  **Run the application:**
     ```bash
     python MealPlanWrapped.py
