@@ -1,4 +1,4 @@
-# <img src="static/favicon.ico" alt="MealPlanWrapped icon" width="30" height="30"> MealPlanWrapped
+# <img src="static/favicon.ico" alt="MealPlanWrapped icon" width="30" height="30"> UVA 2025 MealPlanWrapped
 
 A Flask web application to analyze your university meal plan usage from a CSV export and generate a "wrapped" style summary.
 
