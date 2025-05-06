@@ -1,0 +1,145 @@
+<!--Meal Plan Wrapped Over-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Meal Plan Wrapped - See You Next Year!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+      <!-- Matomo -->
+      <script>
+        var _paq = window._paq = window._paq || [];
+        /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+        _paq.push(['trackPageView']);
+        _paq.push(['enableLinkTracking']);
+        (function() {
+        var u="//tmn.rit.cl/static/services/analytics/";
+        _paq.push(['setTrackerUrl', u+'matomo.php']);
+        _paq.push(['setSiteId', '10']);
+        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+        g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+        })();
+  </script>
+  <!-- End Matomo Code -->
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #232d4b, #e57200);
+      color: #fff;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .background-animation {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0) 70%);
+      animation: pulse 5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.8;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 1;
+      }
+    }
+
+    .message-box {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      max-width: 500px;
+      width: 100%;
+      animation: fadeInUp 1.2s ease;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        transform: translateY(30px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .message-box h1 {
+      font-size: 2.2rem;
+      color: #e57200;
+      margin-bottom: 10px;
+    }
+
+    .message-box p {
+      font-size: 1.1rem;
+      margin: 10px 0;
+      color: #f0f0f0;
+    }
+
+    .icon {
+      font-size: 4rem;
+      color: #e57200;
+      margin-bottom: 20px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    .footer-note {
+      font-size: 0.9rem;
+      color: #ccc;
+      margin-top: 30px;
+    }
+
+    @media (max-width: 500px) {
+      .message-box {
+        padding: 30px 20px;
+      }
+
+      .message-box h1 {
+        font-size: 1.8rem;
+      }
+
+      .icon {
+        font-size: 3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="background-animation"></div>
+  <div class="message-box">
+    <div class="icon"><i class="fas fa-utensils"></i></div>
+    <h1>Meal Plan Wrapped is Closed</h1>
+    <p>Thanks for trying it out this year</p>
+    <p>See you next spring for another one!</p>
+  </div>
+  <footer style="position: absolute; bottom: 10px; width: 100%; text-align: center; color: #fff; font-size: 0.9rem;">
+    Created by Maddox</a>
+</footer>
+</body>
+</html>
